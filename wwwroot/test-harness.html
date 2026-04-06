@@ -324,13 +324,16 @@
             document.getElementById('virtual-energy-left').textContent = 'N/A';
         }
 
-        document.getElementById('virtual-energy-per-lap').textContent =
-            valueIsValid(vePerLap) ? vePerLap.toFixed(2) : 'N/A';
+        if (valueIsValid(vePerLap) && valueIsValid(veCapacity) && veCapacity > 0) {
+            document.getElementById('virtual-energy-per-lap').textContent = ((vePerLap / veCapacity) * 100).toFixed(2);
+        } else {
+            document.getElementById('virtual-energy-per-lap').textContent = 'N/A';
+        }
 
-        // VE Last Lap with color
+        // VE Last Lap with color (displayed as % of capacity)
         const veLastEl = document.getElementById('virtual-energy-last-lap');
-        if (valueIsValid(veLastLap) && valueIsValid(vePerLap)) {
-            veLastEl.textContent = veLastLap.toFixed(2);
+        if (valueIsValid(veLastLap) && valueIsValid(vePerLap) && valueIsValid(veCapacity) && veCapacity > 0) {
+            veLastEl.textContent = ((veLastLap / veCapacity) * 100).toFixed(2);
             veLastEl.style.color = lerpRGB([255,0,0], [0,255,0], (vePerLap - veLastLap) * 2.5 + 0.5);
         } else {
             veLastEl.textContent = 'N/A';

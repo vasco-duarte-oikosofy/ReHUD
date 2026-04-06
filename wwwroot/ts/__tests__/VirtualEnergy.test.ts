@@ -110,21 +110,46 @@ describe('VirtualEnergyPerLap', () => {
     element = createHudElement(VirtualEnergyPerLap, elementId);
   });
 
-  it('shows virtual energy per lap', () => {
+  it('shows virtual energy per lap as percentage of capacity', () => {
     const data = makeExtendedShared({
       vehicleInfo: makeDriverInfo(EEngineType.Hybrid),
+      virtualEnergyCapacity: 10,
     }, {
       virtualEnergyPerLap: 1.25,
     });
     const text = executeAndGetText(element, data, elementId);
-    expect(text).toBe('1.25');
+    // 1.25 / 10 * 100 = 12.5%
+    expect(text).toBe('12.50');
   });
 
   it('shows N/A when per-lap value is invalid', () => {
     const data = makeExtendedShared({
       vehicleInfo: makeDriverInfo(EEngineType.Hybrid),
+      virtualEnergyCapacity: 10,
     }, {
       virtualEnergyPerLap: -1,
+    });
+    const text = executeAndGetText(element, data, elementId);
+    expect(text).toBe('N/A');
+  });
+
+  it('shows N/A when capacity is invalid', () => {
+    const data = makeExtendedShared({
+      vehicleInfo: makeDriverInfo(EEngineType.Hybrid),
+      virtualEnergyCapacity: -1,
+    }, {
+      virtualEnergyPerLap: 1.25,
+    });
+    const text = executeAndGetText(element, data, elementId);
+    expect(text).toBe('N/A');
+  });
+
+  it('shows N/A when capacity is zero', () => {
+    const data = makeExtendedShared({
+      vehicleInfo: makeDriverInfo(EEngineType.Hybrid),
+      virtualEnergyCapacity: 0,
+    }, {
+      virtualEnergyPerLap: 1.25,
     });
     const text = executeAndGetText(element, data, elementId);
     expect(text).toBe('N/A');
@@ -133,6 +158,7 @@ describe('VirtualEnergyPerLap', () => {
   it('hides when engine is not hybrid', () => {
     const data = makeExtendedShared({
       vehicleInfo: makeDriverInfo(EEngineType.Combustion),
+      virtualEnergyCapacity: 10,
     }, {
       virtualEnergyPerLap: 1.25,
     });
@@ -229,20 +255,23 @@ describe('VirtualEnergyLastLap', () => {
     element = createHudElement(VirtualEnergyLastLap, elementId);
   });
 
-  it('shows last lap energy usage', () => {
+  it('shows last lap energy usage as percentage of capacity', () => {
     const data = makeExtendedShared({
       vehicleInfo: makeDriverInfo(EEngineType.Hybrid),
+      virtualEnergyCapacity: 10,
     }, {
       virtualEnergyLastLap: 1.18,
       virtualEnergyPerLap: 1.25,
     });
     const text = executeAndGetText(element, data, elementId);
-    expect(text).toBe('1.18');
+    // 1.18 / 10 * 100 = 11.80
+    expect(text).toBe('11.80');
   });
 
   it('shows N/A when last lap value is invalid', () => {
     const data = makeExtendedShared({
       vehicleInfo: makeDriverInfo(EEngineType.Hybrid),
+      virtualEnergyCapacity: 10,
     }, {
       virtualEnergyLastLap: -1,
       virtualEnergyPerLap: 1.25,
@@ -254,6 +283,7 @@ describe('VirtualEnergyLastLap', () => {
   it('shows N/A when per-lap average is invalid', () => {
     const data = makeExtendedShared({
       vehicleInfo: makeDriverInfo(EEngineType.Hybrid),
+      virtualEnergyCapacity: 10,
     }, {
       virtualEnergyLastLap: 1.18,
       virtualEnergyPerLap: -1,
@@ -262,9 +292,22 @@ describe('VirtualEnergyLastLap', () => {
     expect(text).toBe('N/A');
   });
 
+  it('shows N/A when capacity is invalid', () => {
+    const data = makeExtendedShared({
+      vehicleInfo: makeDriverInfo(EEngineType.Hybrid),
+      virtualEnergyCapacity: -1,
+    }, {
+      virtualEnergyLastLap: 1.18,
+      virtualEnergyPerLap: 1.25,
+    });
+    const text = executeAndGetText(element, data, elementId);
+    expect(text).toBe('N/A');
+  });
+
   it('hides when engine is not hybrid', () => {
     const data = makeExtendedShared({
       vehicleInfo: makeDriverInfo(EEngineType.Combustion),
+      virtualEnergyCapacity: 10,
     }, {
       virtualEnergyLastLap: 1.18,
       virtualEnergyPerLap: 1.25,
@@ -276,6 +319,7 @@ describe('VirtualEnergyLastLap', () => {
   it('colors green when last lap used less energy than average', () => {
     const data = makeExtendedShared({
       vehicleInfo: makeDriverInfo(EEngineType.Hybrid),
+      virtualEnergyCapacity: 10,
     }, {
       virtualEnergyLastLap: 1.0,
       virtualEnergyPerLap: 1.25,
@@ -542,10 +586,11 @@ describe('VirtualEnergyTimeLeft', () => {
 });
 
 describe('VirtualEnergy data contract', () => {
-  it('VirtualEnergyPerLap declares +virtualEnergyPerLap as shared memory key', () => {
+  it('VirtualEnergyPerLap declares +virtualEnergyPerLap and virtualEnergyCapacity as shared memory keys', () => {
     document.body.innerHTML = '';
     const element = createHudElement(VirtualEnergyPerLap, 'test-contract-per-lap');
     expect(element.sharedMemoryKeys).toContain('+virtualEnergyPerLap');
+    expect(element.sharedMemoryKeys).toContain('virtualEnergyCapacity');
   });
 
   it('VirtualEnergyLastLap declares +virtualEnergyLastLap as shared memory key', () => {
