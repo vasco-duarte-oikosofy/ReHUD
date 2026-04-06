@@ -22,7 +22,23 @@ public class VersionService : UserData, IDisposable, IVersionService
 
     public string? AppVersion { get => appVersion; }
 
-    public async Task<string> GetAppVersion() => appVersion ??= await Electron.App.GetVersionAsync();
+    public async Task<string> GetAppVersion() => appVersion ??= ReadVersionFromManifest() ?? await Electron.App.GetVersionAsync();
+
+    public static string? ReadVersionFromManifest(string? path = null)
+    {
+        path ??= Path.Combine(Directory.GetCurrentDirectory(), "electron.manifest.json");
+        try
+        {
+            if (!File.Exists(path)) return null;
+            var json = JObject.Parse(File.ReadAllText(path));
+            return json["build"]?["buildVersion"]?.ToString();
+        }
+        catch (Exception ex)
+        {
+            logger.Warn("Failed to read version from manifest", ex);
+            return null;
+        }
+    }
 
     protected override string? DEFAULT_WHEN_EMPTY => null;
     public static readonly Version DEFAULT_VERSION = Version.Parse("0.0.0");

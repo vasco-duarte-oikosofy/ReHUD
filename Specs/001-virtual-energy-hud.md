@@ -34,8 +34,12 @@ All elements hide automatically when `engineType !== Hybrid`.
 
 ## Color Coding
 
-- **Laps Left**: red (1 lap) → green (5+ laps), same gradient as FuelLapsLeft
-- **Last Lap**: green when below average usage, red when above (vs `virtualEnergyPerLap`)
+- **VE Left / Time Est / Laps Est**: uses `--virtual-energy-left-color` (set by VirtualEnergyLapsLeft)
+- **Laps Left**: red (1 lap) → green (5+ laps), same gradient as FuelLapsLeft. Sets `--virtual-energy-left-color`.
+- **Last Lap**: green when below average usage, red when above (vs `virtualEnergyPerLap`). Sets `--virtual-energy-last-lap-color`.
+- **To Add / To End**: green (0% deficit) → red (20%+ deficit). Sets `--virtual-energy-to-add-color`.
+- **Per Lap**: static `--fuel-middle-color` (yellow)
+- Default on invalid data: Laps Left → green, To Add → `--fuel-middle-color`, Last Lap → `--fuel-middle-color`
 
 ## Files Changed
 
@@ -71,3 +75,20 @@ All elements hide automatically when `engineType !== Hybrid`.
 - **Only tracks VE diff > 0**: negative diffs (energy regeneration between laps) are ignored, only consumption is logged
 - **Consumption data saved on all laps (valid and invalid)**: fuel, VE, and tire wear are logged to the DB regardless of lap validity so averages populate immediately. Only best-lap telemetry is gated on lap validity.
 - **DB migration required**: existing databases need the `VirtualEnergyUsages` table. Migration `20260406140000_AddVirtualEnergyUsages` handles this automatically via EF Core `context.Database.Migrate()`.
+
+## Test Coverage (48 tests)
+
+Test file: `wwwroot/ts/__tests__/VirtualEnergy.test.ts`
+
+| Element | Tests | What's covered |
+|---------|-------|---------------|
+| VirtualEnergyLeft | 7 | percentage calc, 0%/100%, invalid left/capacity/zero-capacity, hides for combustion/electric |
+| VirtualEnergyPerLap | 3 | displays value, N/A on invalid, hides non-hybrid |
+| VirtualEnergyLapsLeft | 6 | laps calc, N/A on invalid left/perLap/zero-perLap, hides non-hybrid, default green color on invalid |
+| VirtualEnergyLastLap | 5 | displays value, N/A on invalid lastLap/perLap, hides non-hybrid, green color when efficient |
+| VirtualEnergyToEnd | 5 | percentage calc, N/A on invalid lapsFinish/perLap/capacity, hides non-hybrid |
+| VirtualEnergyToAdd | 6 | deficit calc, 0% on surplus, N/A on invalid, hides non-hybrid, red on large deficit, green on surplus, middle color on invalid |
+| VirtualEnergyTimeLeft | 5 | time calc, dash format on invalid left/perLap/avgLap, hides non-hybrid |
+| Data contract | 5 | shared memory key declarations for PerLap, LastLap, LapsLeft |
+
+Additional tests in `FuelLeft.test.ts` (3) and `smoke.test.ts` (1) bring total to 48.

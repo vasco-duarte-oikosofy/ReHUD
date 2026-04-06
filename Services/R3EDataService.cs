@@ -300,11 +300,11 @@ namespace ReHUD.Services
                     bool tireWearDataValid = lastTireWear != null && tireWearNow != null;
                     TireWearObj? tireWearDiff = tireWearDataValid ? lastTireWear! - tireWearNow! : null;
 
-                    bool fuelDataValid = lastFuel != null && fuelNow != -1;
-                    float? fuelDiff = fuelDataValid ? lastFuel - fuelNow : null;
+                    float? fuelDiff = CalcFuelDiff(lastFuel, fuelNow);
+                    bool fuelDataValid = fuelDiff != null;
 
-                    bool virtualEnergyDataValid = lastVirtualEnergy != null && virtualEnergyNow != null;
-                    float? virtualEnergyDiff = virtualEnergyDataValid ? lastVirtualEnergy - virtualEnergyNow : null;
+                    float? virtualEnergyDiff = CalcVirtualEnergyDiff(lastVirtualEnergy, virtualEnergyNow);
+                    bool virtualEnergyDataValid = virtualEnergyDiff != null;
 
                     // Always save the lap and consumption data (fuel, VE, tire wear),
                     // even on invalid laps — so per-lap averages populate immediately.
@@ -328,7 +328,7 @@ namespace ReHUD.Services
                                     lapDataService.Log(new FuelUsage(lap, fuelDiff!.Value, new FuelUsageContext(data.fuelUseActive)));
                                 }
 
-                                if (virtualEnergyDataValid && virtualEnergyDiff > 0) {
+                                if (ShouldSaveVirtualEnergy(virtualEnergyDiff)) {
                                     lapDataService.Log(new VirtualEnergyUsage(lap, virtualEnergyDiff!.Value));
                                 }
 
@@ -407,5 +407,22 @@ namespace ReHUD.Services
             var emptyData = R3EExtraData.NewEmpty();
             await IpcCommunication.Invoke(window, "r3eData", emptyData.Serialize(usedKeys));
         }
+
+        /// <summary>Calculates fuel consumed this lap. Returns null if either value is missing.</summary>
+        public static float? CalcFuelDiff(float? lastFuel, float? fuelNow)
+        {
+            if (lastFuel == null || fuelNow == null || fuelNow == -1) return null;
+            return lastFuel - fuelNow;
+        }
+
+        /// <summary>Calculates VE consumed this lap. Returns null if either value is missing.</summary>
+        public static float? CalcVirtualEnergyDiff(float? lastVE, float? veNow)
+        {
+            if (lastVE == null || veNow == null) return null;
+            return lastVE - veNow;
+        }
+
+        /// <summary>Returns true if VE consumption should be persisted (positive diff only).</summary>
+        public static bool ShouldSaveVirtualEnergy(float? veDiff) => veDiff != null && veDiff > 0;
     }
 }
