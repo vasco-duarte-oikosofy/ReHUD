@@ -952,6 +952,17 @@ export default interface IShared {
      */
     waterLeft: number;
 
+    /**
+     * Virtual energy left (-1.0 = N/A)
+     * Unit: Mega-Joule (MJ)
+     */
+    virtualEnergyLeft: number;
+
+    /**
+     * Virtual energy capacity (-1.0 = N/A)
+     * Unit: Mega-Joule (MJ)
+     */
+    virtualEnergyCapacity: number;
 
     vehicleUnused1: IOrientation;
 

@@ -40,6 +40,8 @@ export interface IExtendedShared {
   deltaToBestLap: number;
   crossedFinishLine: boolean;
   currentLaptime: number;
+  virtualEnergyPerLap: number;
+  virtualEnergyLastLap: number;
 }
 
 /* ========================================== Constants ========================================== */
@@ -155,6 +157,7 @@ export const TRANSFORMABLES = {
   'tires': 'Tires',
   'damage': 'Damage',
   'fuel-data': 'Fuel Data',
+  'virtual-energy-data': 'VE Data',
 
   'radar': 'Radar',
   'delta': 'Delta',

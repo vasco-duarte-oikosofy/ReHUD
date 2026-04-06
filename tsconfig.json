@@ -14,7 +14,8 @@
         "allowJs": true
     },
     "exclude": [
-        "node_modules"
+        "node_modules",
+        "wwwroot/ts/__tests__"
     ],
     "include": [
         "wwwroot/ts/**/*"

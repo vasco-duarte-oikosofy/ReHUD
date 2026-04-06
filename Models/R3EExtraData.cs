@@ -14,6 +14,8 @@ public struct R3EExtraData
     public double? allTimeBestLapTime;
     public double? fuelPerLap;
     public double? fuelLastLap;
+    public double? virtualEnergyPerLap;
+    public double? virtualEnergyLastLap;
     public TireWearObj? tireWearPerLap;
     public TireWearObj? tireWearLastLap;
     public double? averageLapTime;
@@ -72,6 +74,8 @@ public struct R3EExtraData
         return new R3EExtraData {
             fuelPerLap = 0,
             fuelLastLap = 0,
+            virtualEnergyPerLap = 0,
+            virtualEnergyLastLap = 0,
             tireWearPerLap = new TireWearObj(),
             tireWearLastLap = new TireWearObj(),
             averageLapTime = 0,

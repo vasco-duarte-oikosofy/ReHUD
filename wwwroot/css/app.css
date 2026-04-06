@@ -11,6 +11,10 @@
   --fuel-last-lap-color: var(--fuel-middle-color);
   --fuel-to-add-color: var(--fuel-middle-color);
 
+  --virtual-energy-left-color: rgb(0, 255, 0);
+  --virtual-energy-last-lap-color: var(--fuel-middle-color);
+  --virtual-energy-to-add-color: var(--fuel-middle-color);
+
 
   --temp-color-normal: rgb(0, 0, 255);
 
@@ -250,6 +254,41 @@ he#basic td {
   color: var(--fuel-middle-color);
 }
 
+#virtual-energy-data span {
+  font-size: 26px;
+}
+
+#virtual-energy-left {
+  color: var(--virtual-energy-left-color);
+}
+
+#virtual-energy-to-add,
+#virtual-energy-to-end {
+  color: var(--virtual-energy-to-add-color);
+}
+
+#virtual-energy-left,
+#virtual-energy-to-add,
+#virtual-energy-to-end {
+  font-size: 40px !important;
+}
+
+#virtual-energy-time {
+  color: var(--virtual-energy-left-color);
+}
+
+#virtual-energy-laps {
+  color: var(--virtual-energy-left-color);
+}
+
+#virtual-energy-last-lap {
+  color: var(--virtual-energy-last-lap-color);
+}
+
+#virtual-energy-per-lap {
+  color: var(--fuel-middle-color);
+}
+
 
 
 
@@ -447,7 +486,8 @@ he#basic td {
 }
 
 
-#fuel-data {
+#fuel-data,
+#virtual-energy-data {
   height: max-content;
 }
 

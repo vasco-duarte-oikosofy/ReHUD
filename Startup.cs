@@ -576,12 +576,9 @@ public class Startup
     private static readonly string[] hardwareAccelerationSettings = new string[] { "disable-gpu-compositing", "disable-gpu", "disable-software-rasterizer" };
     private static void SetHardwareAccelerationEnabled(bool enabled) {
         logger.InfoFormat("Setting hardware acceleration: {0}", enabled);
-        if (enabled) {
-            foreach (var setting in hardwareAccelerationSettings) {
-                Electron.App.CommandLine.RemoveSwitch(setting);
-            }
-        }
-        else {
+        if (!enabled) {
+            // Note: RemoveSwitch is not available in public ElectronNET.API v23.6.2.
+            // Switches are only removed on app restart (they are not persisted).
             foreach (var setting in hardwareAccelerationSettings) {
                 Electron.App.CommandLine.AppendSwitch(setting);
             }

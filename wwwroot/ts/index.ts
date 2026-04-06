@@ -47,6 +47,13 @@ import Rake from './hudElements/Rake.js';
 import DRS from './hudElements/Drs.js';
 import P2P from './hudElements/PushToPass.js';
 import TvTower from './hudElements/TvTower.js';
+import VirtualEnergyLeft from './hudElements/VirtualEnergyLeft.js';
+import VirtualEnergyPerLap from './hudElements/VirtualEnergyPerLap.js';
+import VirtualEnergyLapsLeft from './hudElements/VirtualEnergyLapsLeft.js';
+import VirtualEnergyLastLap from './hudElements/VirtualEnergyLastLap.js';
+import VirtualEnergyToEnd from './hudElements/VirtualEnergyToEnd.js';
+import VirtualEnergyToAdd from './hudElements/VirtualEnergyToAdd.js';
+import VirtualEnergyTimeLeft from './hudElements/VirtualEnergyTimeLeft.js';
 import {GracePeriodBetweenPresets} from './SharedMemorySupplier.js';
 
 enableLogging(ipcRenderer, 'index.js');
@@ -76,6 +83,14 @@ const hud = new Hud([
     new FuelToEnd({name: 'FuelToEnd', elementId: 'fuel-to-end', transformableId: 'fuel-data', renderEvery: 200}),
     new FuelToAdd({name: 'FuelToAdd', elementId: 'fuel-to-add', transformableId: 'fuel-data', renderEvery: 200}),
     new FuelElement({name: 'FuelElement', elementId: 'fuel-data', transformableId: 'fuel-data', renderEvery: 200}),
+
+    new VirtualEnergyLeft({name: 'VirtualEnergyLeft', elementId: 'virtual-energy-left', transformableId: 'virtual-energy-data', renderEvery: 200}),
+    new VirtualEnergyPerLap({name: 'VirtualEnergyPerLap', elementId: 'virtual-energy-per-lap', transformableId: 'virtual-energy-data', renderEvery: 500}),
+    new VirtualEnergyLapsLeft({name: 'VirtualEnergyLapsLeft', elementId: 'virtual-energy-laps', transformableId: 'virtual-energy-data', renderEvery: 200}),
+    new VirtualEnergyLastLap({name: 'VirtualEnergyLastLap', elementId: 'virtual-energy-last-lap', transformableId: 'virtual-energy-data', renderEvery: 200}),
+    new VirtualEnergyToEnd({name: 'VirtualEnergyToEnd', elementId: 'virtual-energy-to-end', transformableId: 'virtual-energy-data', renderEvery: 200}),
+    new VirtualEnergyToAdd({name: 'VirtualEnergyToAdd', elementId: 'virtual-energy-to-add', transformableId: 'virtual-energy-data', renderEvery: 200}),
+    new VirtualEnergyTimeLeft({name: 'VirtualEnergyTimeLeft', elementId: 'virtual-energy-time', transformableId: 'virtual-energy-data', renderEvery: 200}),
 
     new Tires({name: 'Tires', elementId: 'tires', transformableId: 'tires', renderEvery: 10}),
     new Damage({name: 'Damage', elementId: 'damage', transformableId: 'damage', renderEvery: 30}),

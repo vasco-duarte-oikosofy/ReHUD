@@ -7,7 +7,10 @@
     "ws": "^8.17.1"
   },
   "devDependencies": {
+    "@vitest/coverage-v8": "^3.1.1",
+    "jsdom": "^26.0.0",
     "typescript": "^5.3.3",
+    "vitest": "^3.1.1",
     "webpack": "^5.88.2",
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^4.15.1",
@@ -16,7 +19,9 @@
   "scripts": {
     "prestart": ".\\node_modules\\.bin\\tsc && webpack --devtool source-map --config webpack.config.js",
     "start": "electronize start /args --inspect=9090",
-    "build": "npm run prestart && electronize build /target win"
+    "build": "npm run prestart && electronize build /target win",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "type": "module"
 }

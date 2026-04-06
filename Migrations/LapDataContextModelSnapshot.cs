@@ -202,6 +202,29 @@ namespace ReHUD.Migrations
                     b.ToTable("TireWearContexts");
                 });
 
+            modelBuilder.Entity("ReHUD.Models.LapData.VirtualEnergyUsage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("DataId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("PendingRemoval")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double>("Value")
+                        .HasColumnType("REAL");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DataId")
+                        .IsUnique();
+
+                    b.ToTable("VirtualEnergyUsages");
+                });
+
             modelBuilder.Entity("ReHUD.Models.LapData.FuelUsage", b =>
                 {
                     b.HasOne("ReHUD.Models.LapData.Lap", "Lap")
@@ -327,6 +350,15 @@ namespace ReHUD.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ReHUD.Models.LapData.VirtualEnergyUsage", b =>
+                {
+                    b.HasOne("ReHUD.Models.LapData.Lap", "Lap")
+                        .WithOne("VirtualEnergyUsage")
+                        .HasForeignKey("ReHUD.Models.LapData.VirtualEnergyUsage", "DataId");
+
+                    b.Navigation("Lap");
+                });
+
             modelBuilder.Entity("ReHUD.Models.LapData.FuelUsageContext", b =>
                 {
                     b.Navigation("Entries");
@@ -342,6 +374,8 @@ namespace ReHUD.Migrations
                     b.Navigation("Telemetry");
 
                     b.Navigation("TireWear");
+
+                    b.Navigation("VirtualEnergyUsage");
                 });
 
             modelBuilder.Entity("ReHUD.Models.LapData.LapContext", b =>

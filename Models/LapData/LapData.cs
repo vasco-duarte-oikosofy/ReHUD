@@ -94,6 +94,8 @@ namespace ReHUD.Models.LapData
         public IEnumerable<TireWear> TireWears => Entries.Where(l => l.TireWear != null).Select(l => l.TireWear!);
         [NotMapped]
         public IEnumerable<FuelUsage> FuelUsages => Entries.Where(l => l.FuelUsage != null).Select(l => l.FuelUsage!);
+        [NotMapped]
+        public IEnumerable<VirtualEnergyUsage> VirtualEnergyUsages => Entries.Where(l => l.VirtualEnergyUsage != null).Select(l => l.VirtualEnergyUsage!);
 
         [NotMapped]
         public List<LapPointer> Pointers
@@ -104,6 +106,7 @@ namespace ReHUD.Models.LapData
                 pointers.AddRange(LapTimes);
                 pointers.AddRange(TireWears);
                 pointers.AddRange(FuelUsages);
+                pointers.AddRange(VirtualEnergyUsages);
                 if (BestLap != null && BestLap.Telemetry != null) pointers.Add(BestLap.Telemetry);
                 return pointers;
             }
@@ -202,6 +205,15 @@ namespace ReHUD.Models.LapData
             }
         }
 
+        private VirtualEnergyUsage? _virtualEnergyUsage;
+        public virtual VirtualEnergyUsage? VirtualEnergyUsage {
+            get => _virtualEnergyUsage;
+            set {
+                _virtualEnergyUsage = value;
+                if (value != null) value.Lap = this;
+            }
+        }
+
         private Telemetry? _telemetry;
         public virtual Telemetry? Telemetry {
             get => _telemetry;
@@ -220,6 +232,7 @@ namespace ReHUD.Models.LapData
                 pointers.Add(LapTime);
                 if (TireWear != null) pointers.Add(TireWear);
                 if (FuelUsage != null) pointers.Add(FuelUsage);
+                if (VirtualEnergyUsage != null) pointers.Add(VirtualEnergyUsage);
                 if (Telemetry != null) pointers.Add(Telemetry);
                 return pointers;
             }
@@ -410,6 +423,12 @@ namespace ReHUD.Models.LapData
         public FuelUsage(Lap lap, double value, FuelUsageContext context) : base(lap, value, context) { }
     }
 
+    public class VirtualEnergyUsage : LapPointer<double> {
+        [Obsolete("EF Core only")]
+        public VirtualEnergyUsage() { }
+        public VirtualEnergyUsage(Lap lap, double value) : base(lap, value) { }
+    }
+
     public class Telemetry : LapPointer<TelemetryObj> {
         [Obsolete("EF Core only")]
         public Telemetry() { }
@@ -519,10 +538,12 @@ namespace ReHUD.Models.LapData
         public double? AverageLapTime { get; set; }
         public TireWearObj? AverageTireWear { get; set; }
         public double? AverageFuelUsage { get; set; }
+        public double? AverageVirtualEnergyUsage { get; set; }
 
         public double? LastLapTime { get; set; }
         public TireWearObj? LastTireWear { get; set; }
         public double? LastFuelUsage { get; set; }
+        public double? LastVirtualEnergyUsage { get; set; }
 
         public double? BestLapTime { get; set; }
     }

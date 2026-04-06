@@ -45,6 +45,8 @@ namespace ReHUD.Services
         private DateTime lastLapInvalidation = DateTime.MinValue;
         private float? lastFuel = null;
         private float? lastFuelUsage = null;
+        private float? lastVirtualEnergy = null;
+        private float? lastVirtualEnergyUsage = null;
         private TireWearObj? lastTireWear = null;
         private TireWearObj? lastTireWearDiff = null;
         private int? lastLapNum = null;
@@ -189,6 +191,8 @@ namespace ReHUD.Services
                     CombinationSummary combination = lapDataService.GetCombinationSummary(dataClone.layoutId, dataClone.vehicleInfo.modelId, tireSubtypeFront, tireSubtypeRear);
                     extraData.fuelPerLap = combination.AverageFuelUsage;
                     extraData.fuelLastLap = lastFuelUsage;
+                    extraData.virtualEnergyPerLap = combination.AverageVirtualEnergyUsage;
+                    extraData.virtualEnergyLastLap = lastVirtualEnergyUsage;
                     extraData.tireWearPerLap = combination.AverageTireWear;
                     extraData.tireWearLastLap = lastTireWearDiff;
                     extraData.averageLapTime = combination.AverageLapTime;
@@ -248,6 +252,7 @@ namespace ReHUD.Services
                     if (dataClone.sessionType == -1) {
                         lastLapNum = null;
                         lastFuel = null;
+                        lastVirtualEnergy = null;
                         lastTireWear = null;
                     }
                 } else if (window != null && !(hudShown ?? false)) {
@@ -280,6 +285,7 @@ namespace ReHUD.Services
 
             float? fuelNow = data.vehicleInfo.engineType == 1 ? data.batterySoC : data.fuelLeft;
             fuelNow = fuelNow == -1 ? null : fuelNow;
+            float? virtualEnergyNow = data.virtualEnergyLeft == -1 ? null : data.virtualEnergyLeft;
             TireWearObj tireWearNow = AsTireWear(data.tireWear);
             bool lapSaved = false;
 
@@ -297,7 +303,13 @@ namespace ReHUD.Services
                     bool fuelDataValid = lastFuel != null && fuelNow != -1;
                     float? fuelDiff = fuelDataValid ? lastFuel - fuelNow : null;
 
-                    if (lapValid) {
+                    bool virtualEnergyDataValid = lastVirtualEnergy != null && virtualEnergyNow != null;
+                    float? virtualEnergyDiff = virtualEnergyDataValid ? lastVirtualEnergy - virtualEnergyNow : null;
+
+                    // Always save the lap and consumption data (fuel, VE, tire wear),
+                    // even on invalid laps — so per-lap averages populate immediately.
+                    // Only best-lap telemetry is gated on lapValid.
+                    {
                         LapContext context = new(data.layoutId, data.vehicleInfo.modelId, data.vehicleInfo.classPerformanceIndex, data.tireSubtypeFront, data.tireSubtypeRear);
                         if (laptime != null) {
                             var savedTransaction = false;
@@ -316,13 +328,14 @@ namespace ReHUD.Services
                                     lapDataService.Log(new FuelUsage(lap, fuelDiff!.Value, new FuelUsageContext(data.fuelUseActive)));
                                 }
 
-                                if (res.Item2) {
+                                if (virtualEnergyDataValid && virtualEnergyDiff > 0) {
+                                    lapDataService.Log(new VirtualEnergyUsage(lap, virtualEnergyDiff!.Value));
+                                }
+
+                                if (lapValid && res.Item2) {
                                     SaveBestLap(lap, res.Item1.BestLap!.GetNonNullPoints(), Driver.DATA_POINTS_GAP);
                                 }
 
-                                // Commit async to not block the thread.
-                                // This is safe because this method is only called when a lap is completed, so there's plenty of time between calls.
-                                // TODO: Maybe move this to a separate thread with a queue?
                                 transaction.CommitAsync();
                                 savedTransaction = true;
                             } catch (Exception e) {
@@ -337,8 +350,6 @@ namespace ReHUD.Services
                             logger.Error("No valid laptime found, not saving lap");
                             extraData.lapId = null;
                         }
-                    } else {
-                        logger.Info("Lap not valid, not saving lap");
                     }
 
                     if (data.tireWearActive >= 1) {
@@ -346,6 +357,9 @@ namespace ReHUD.Services
                     }
                     if (data.fuelUseActive >= 1) {
                         lastFuelUsage = fuelDiff;
+                    }
+                    if (virtualEnergyDataValid) {
+                        lastVirtualEnergyUsage = virtualEnergyDiff;
                     }
                 }
             } finally {
@@ -356,6 +370,7 @@ namespace ReHUD.Services
                     }
                     ForceSetLapValid();
                     lastFuel = fuelNow;
+                    lastVirtualEnergy = virtualEnergyNow;
                     lastTireWear = tireWearNow;
                 }
 

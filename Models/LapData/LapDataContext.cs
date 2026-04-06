@@ -15,6 +15,7 @@ namespace ReHUD.Models.LapData {
         public DbSet<LapTime> LapTimes { get; set; }
         public DbSet<TireWear> TireWears { get; set; }
         public DbSet<FuelUsage> FuelUsages { get; set; }
+        public DbSet<VirtualEnergyUsage> VirtualEnergyUsages { get; set; }
         public DbSet<Telemetry> BestLaps { get; set; }
 
         private static readonly string DATA_FK = "DataId";
@@ -60,6 +61,7 @@ namespace ReHUD.Models.LapData {
                 lapData.HasOne(l => l.LapTime).WithOne(c => c.Lap).HasForeignKey<LapTime>(DATA_FK).IsRequired();
                 lapData.HasOne(l => l.TireWear).WithOne(c => c.Lap).HasForeignKey<TireWear>(DATA_FK).IsRequired(false);
                 lapData.HasOne(l => l.FuelUsage).WithOne(c => c.Lap).HasForeignKey<FuelUsage>(DATA_FK).IsRequired(false);
+                lapData.HasOne(l => l.VirtualEnergyUsage).WithOne(c => c.Lap).HasForeignKey<VirtualEnergyUsage>(DATA_FK).IsRequired(false);
                 lapData.HasOne(l => l.Telemetry).WithOne(c => c.Lap).HasForeignKey<Telemetry>(DATA_FK).IsRequired(false);
 
                 var tireWear = modelBuilder.Entity<TireWear>();

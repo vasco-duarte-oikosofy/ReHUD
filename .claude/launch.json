@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dotnet-backend",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--urls", "http://localhost:5093"],
+      "port": 5093
+    },
+    {
+      "name": "electron-app",
+      "runtimeExecutable": "electronize",
+      "runtimeArgs": ["start"],
+      "port": 8988
+    },
+    {
+      "name": "test-harness",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["serve", "wwwroot", "-l", "3000", "--no-clipboard"],
+      "port": 3000
+    },
+    {
+      "name": "vitest-watch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "test:watch"],
+      "port": 51204
+    }
+  ]
+}

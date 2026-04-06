@@ -147,6 +147,7 @@ namespace ReHUD.Services {
                     LapTime => (IEnumerable<T>) lapContext.LapTimes,
                     TireWear => (IEnumerable<T>) lapContext.TireWears,
                     FuelUsage => (IEnumerable<T>) lapContext.FuelUsages,
+                    VirtualEnergyUsage => (IEnumerable<T>) lapContext.VirtualEnergyUsages,
                     _ => throw new ArgumentException("Invalid type"),
                 };
 
@@ -199,6 +200,7 @@ namespace ReHUD.Services {
                 var lapTimes = lapContext.LapTimes;
                 var tireWears = lapContext.TireWears;
                 var fuelUsages = lapContext.FuelUsages;
+                var virtualEnergyUsages = lapContext.VirtualEnergyUsages;
                 var bestLap = lapContext.BestLap;
                 return new CombinationSummary {
                     TrackLayoutId = trackLayoutId,
@@ -206,9 +208,11 @@ namespace ReHUD.Services {
                     AverageLapTime = Average(lapTimes, l => l.Value),
                     AverageTireWear = Average(tireWears),
                     AverageFuelUsage = Average(fuelUsages, l => l.Value),
+                    AverageVirtualEnergyUsage = Average(virtualEnergyUsages, l => l.Value),
                     LastLapTime = lapTimes.LastOrDefault()?.Value,
                     LastTireWear = tireWears.LastOrDefault()?.Value,
                     LastFuelUsage = fuelUsages.LastOrDefault()?.Value,
+                    LastVirtualEnergyUsage = virtualEnergyUsages.LastOrDefault()?.Value,
                     BestLapTime = bestLap?.LapTime.Value,
                 };
             } catch (Exception e) {

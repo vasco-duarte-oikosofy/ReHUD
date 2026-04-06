@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ReHUD - Visual Test Harness</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: #1a1a2e;
+            color: #eee;
+            font-family: 'Segoe UI', system-ui, monospace;
+            margin: 0;
+            padding: 20px;
+        }
+        #controls {
+            position: fixed;
+            top: 0;
+            right: 0;
+            background: #16213e;
+            padding: 15px;
+            border-left: 2px solid #0f3460;
+            border-bottom: 2px solid #0f3460;
+            z-index: 1000;
+            max-height: 100vh;
+            overflow-y: auto;
+            width: 320px;
+        }
+        #controls h2 { margin-top: 0; color: #e94560; }
+        #controls label { display: block; margin: 6px 0 2px; font-size: 12px; color: #aaa; }
+        #controls input, #controls select {
+            width: 100%;
+            padding: 4px;
+            background: #1a1a2e;
+            color: #eee;
+            border: 1px solid #0f3460;
+        }
+        #controls button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background: #e94560;
+            color: white;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+        }
+        #controls button:hover { background: #c73e54; }
+        #hud-preview { margin-right: 350px; }
+        .section { margin-bottom: 15px; border-bottom: 1px solid #0f3460; padding-bottom: 10px; }
+        .section h3 { margin: 0 0 8px; color: #53a8b6; font-size: 13px; }
+
+        /* HUD styling */
+        .hud-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 20px;
+            max-width: 520px;
+        }
+        .hud-panel h3 {
+            margin: 0 0 12px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #888;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding-bottom: 6px;
+        }
+        .hud-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+        }
+        .hud-cell {
+            text-align: center;
+        }
+        .hud-cell .value {
+            font-size: 22px;
+            font-weight: 700;
+            display: block;
+            line-height: 1.2;
+        }
+        .hud-cell .label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #888;
+            display: block;
+            margin-top: 2px;
+        }
+        .hud-cell .value.large {
+            font-size: 32px;
+        }
+        .hidden-panel {
+            opacity: 0.2;
+        }
+        .hidden-panel::after {
+            content: ' (hidden for non-hybrid)';
+            color: #e94560;
+            font-size: 11px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="hud-preview">
+    <!-- Fuel Data Panel -->
+    <div class="hud-panel" id="fuel-panel">
+        <h3>Fuel</h3>
+        <div class="hud-grid">
+            <div class="hud-cell">
+                <span class="value large" id="fuel-left">--</span>
+                <span class="label">Fuel Remain</span>
+            </div>
+            <div class="hud-cell">
+                <span class="value" id="fuel-laps">--</span>
+                <span class="label">Laps Est</span>
+            </div>
+            <div class="hud-cell">
+                <span class="value" id="fuel-time">--</span>
+                <span class="label">Time Est</span>
+            </div>
+            <div class="hud-cell">
+                <span class="value" id="fuel-per-lap">--</span>
+                <span class="label">Fuel / Lap</span>
+            </div>
+            <div class="hud-cell">
+                <span class="value" id="fuel-last-lap">--</span>
+                <span class="label">Last Lap</span>
+            </div>
+            <div class="hud-cell">
+                <span class="value" id="fuel-to-end">--</span>
+                <span class="label">To End</span>
+            </div>
+            <div class="hud-cell">
+                <span class="value" id="fuel-to-add">--</span>
+                <span class="label">To Add</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Virtual Energy Panel -->
+    <div class="hud-panel" id="ve-panel">
+        <h3>Virtual Energy</h3>
+        <div class="hud-grid">
+            <div class="hud-cell">
+                <span class="value large" id="virtual-energy-left">--</span>
+                <span class="label">VE Remain</span>
+            </div>
+            <div class="hud-cell">
+                <span class="value" id="virtual-energy-time">--</span>
+                <span class="label">VE Time Est</span>
+            </div>
+            <div class="hud-cell">
+                <span class="value" id="virtual-energy-laps">--</span>
+                <span class="label">VE Laps Est</span>
+            </div>
+            <div class="hud-cell">
+                <span class="value" id="virtual-energy-per-lap">--</span>
+                <span class="label">VE / Lap</span>
+            </div>
+            <div class="hud-cell">
+                <span class="value" id="virtual-energy-last-lap">--</span>
+                <span class="label">VE Last Lap</span>
+            </div>
+            <div class="hud-cell">
+                <span class="value" id="virtual-energy-to-end">--</span>
+                <span class="label">VE To End</span>
+            </div>
+            <div class="hud-cell">
+                <span class="value" id="virtual-energy-to-add">--</span>
+                <span class="label">VE To Add</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="controls">
+    <h2>Test Harness</h2>
+
+    <div class="section">
+        <h3>Vehicle</h3>
+        <label>Engine Type</label>
+        <select id="ctrl-engine-type">
+            <option value="0">Combustion</option>
+            <option value="1">Electric</option>
+            <option value="2" selected>Hybrid</option>
+        </select>
+    </div>
+
+    <div class="section">
+        <h3>Fuel</h3>
+        <label>Fuel Left (L)</label>
+        <input type="range" id="ctrl-fuel-left" min="0" max="120" value="45" step="0.1">
+        <span id="val-fuel-left">45.0</span>
+
+        <label>Fuel Capacity (L)</label>
+        <input type="number" id="ctrl-fuel-capacity" value="120" step="1">
+
+        <label>Fuel Per Lap (L)</label>
+        <input type="number" id="ctrl-fuel-per-lap" value="3.2" step="0.01">
+
+        <label>Fuel Last Lap (L)</label>
+        <input type="number" id="ctrl-fuel-last-lap" value="3.15" step="0.01">
+
+        <label>Battery SoC (%)</label>
+        <input type="range" id="ctrl-battery-soc" min="-1" max="100" value="-1" step="0.1">
+        <span id="val-battery-soc">-1</span>
+    </div>
+
+    <div class="section">
+        <h3>Virtual Energy (Hybrid)</h3>
+        <label>Virtual Energy Left (MJ)</label>
+        <input type="range" id="ctrl-ve-left" min="0" max="10" value="4.5" step="0.01">
+        <span id="val-ve-left">4.50</span>
+
+        <label>Virtual Energy Capacity (MJ)</label>
+        <input type="number" id="ctrl-ve-capacity" value="10" step="0.1">
+
+        <label>Virtual Energy Per Lap (MJ)</label>
+        <input type="number" id="ctrl-ve-per-lap" value="1.2" step="0.01">
+
+        <label>Virtual Energy Last Lap (MJ)</label>
+        <input type="number" id="ctrl-ve-last-lap" value="1.18" step="0.01">
+    </div>
+
+    <div class="section">
+        <h3>Session</h3>
+        <label>Average Lap Time (s)</label>
+        <input type="number" id="ctrl-avg-lap" value="92.5" step="0.1">
+
+        <label>Laps Until Finish</label>
+        <input type="number" id="ctrl-laps-finish" value="15" step="1">
+    </div>
+
+    <button id="btn-update">Update HUD</button>
+    <button id="btn-auto" style="background:#53a8b6">Toggle Auto-Update (OFF)</button>
+</div>
+
+<script>
+    function getVal(id) {
+        return parseFloat(document.getElementById(id).value);
+    }
+
+    function valueIsValid(val) {
+        return val !== -1 && val != null && !isNaN(val);
+    }
+
+    function lerpRGB(c1, c2, t) {
+        t = Math.max(0, Math.min(t, 1));
+        return `rgb(${Math.round(c1[0] + (c2[0]-c1[0])*t)}, ${Math.round(c1[1] + (c2[1]-c1[1])*t)}, ${Math.round(c1[2] + (c2[2]-c1[2])*t)})`;
+    }
+
+    function updateHUD() {
+        const engineType = parseInt(document.getElementById('ctrl-engine-type').value);
+        let fuelLeft = getVal('ctrl-fuel-left');
+        const fuelCapacity = getVal('ctrl-fuel-capacity');
+        const fuelPerLap = getVal('ctrl-fuel-per-lap');
+        const fuelLastLap = getVal('ctrl-fuel-last-lap');
+        const batterySoC = getVal('ctrl-battery-soc');
+        const veLeft = getVal('ctrl-ve-left');
+        const veCapacity = getVal('ctrl-ve-capacity');
+        const vePerLap = getVal('ctrl-ve-per-lap');
+        const veLastLap = getVal('ctrl-ve-last-lap');
+        const avgLap = getVal('ctrl-avg-lap');
+        const lapsFinish = getVal('ctrl-laps-finish');
+
+        let displayFuel = fuelLeft;
+        if (engineType === 1) displayFuel = batterySoC;
+
+        // --- Fuel elements ---
+        document.getElementById('fuel-left').textContent =
+            valueIsValid(displayFuel) ? displayFuel.toFixed(1) : 'N/A';
+
+        document.getElementById('fuel-per-lap').textContent =
+            valueIsValid(fuelPerLap) ? fuelPerLap.toFixed(2) : 'N/A';
+
+        const flEl = document.getElementById('fuel-last-lap');
+        flEl.textContent = valueIsValid(fuelLastLap) ? fuelLastLap.toFixed(2) : 'N/A';
+        if (valueIsValid(fuelLastLap) && valueIsValid(fuelPerLap)) {
+            flEl.style.color = lerpRGB([255,0,0], [0,255,0], (fuelPerLap - fuelLastLap) * 2.5 + 0.5);
+        }
+
+        if (valueIsValid(displayFuel) && valueIsValid(fuelPerLap) && fuelPerLap > 0) {
+            const lapsLeft = displayFuel / fuelPerLap;
+            document.getElementById('fuel-laps').textContent = lapsLeft.toFixed(1);
+            document.getElementById('fuel-laps').style.color =
+                lerpRGB([255,0,0], [0,255,0], (lapsLeft - 1) / 4);
+        } else {
+            document.getElementById('fuel-laps').textContent = 'N/A';
+        }
+
+        if (valueIsValid(displayFuel) && valueIsValid(fuelPerLap) && fuelPerLap > 0 && valueIsValid(avgLap)) {
+            const timeLeft = (displayFuel / fuelPerLap) * avgLap;
+            const mins = Math.floor(timeLeft / 60);
+            const secs = Math.floor(timeLeft % 60);
+            document.getElementById('fuel-time').textContent = `${mins}:${secs.toString().padStart(2,'0')}`;
+        } else {
+            document.getElementById('fuel-time').textContent = 'N/A';
+        }
+
+        const fuelToEnd = valueIsValid(fuelPerLap) ? (lapsFinish * fuelPerLap) : null;
+        document.getElementById('fuel-to-end').textContent =
+            fuelToEnd != null ? fuelToEnd.toFixed(1) : 'N/A';
+
+        const fuelToAdd = fuelToEnd != null && valueIsValid(displayFuel) ? Math.max(0, fuelToEnd - displayFuel) : null;
+        document.getElementById('fuel-to-add').textContent =
+            fuelToAdd != null ? fuelToAdd.toFixed(1) : 'N/A';
+
+        // --- Virtual Energy elements ---
+        const veVisible = engineType === 2;
+        const vePanel = document.getElementById('ve-panel');
+        vePanel.classList.toggle('hidden-panel', !veVisible);
+
+        // VE Left as percentage
+        if (valueIsValid(veLeft) && valueIsValid(veCapacity) && veCapacity > 0) {
+            const pct = (veLeft / veCapacity) * 100;
+            const el = document.getElementById('virtual-energy-left');
+            el.textContent = `${pct.toFixed(1)}%`;
+            // Color from red (0%) to green (100%)
+            el.style.color = lerpRGB([255,0,0], [0,255,0], pct / 100);
+        } else {
+            document.getElementById('virtual-energy-left').textContent = 'N/A';
+        }
+
+        document.getElementById('virtual-energy-per-lap').textContent =
+            valueIsValid(vePerLap) ? vePerLap.toFixed(2) : 'N/A';
+
+        // VE Last Lap with color
+        const veLastEl = document.getElementById('virtual-energy-last-lap');
+        if (valueIsValid(veLastLap) && valueIsValid(vePerLap)) {
+            veLastEl.textContent = veLastLap.toFixed(2);
+            veLastEl.style.color = lerpRGB([255,0,0], [0,255,0], (vePerLap - veLastLap) * 2.5 + 0.5);
+        } else {
+            veLastEl.textContent = 'N/A';
+            veLastEl.style.color = '';
+        }
+
+        // VE Laps Left with color
+        if (valueIsValid(veLeft) && valueIsValid(vePerLap) && vePerLap > 0) {
+            const veLaps = veLeft / vePerLap;
+            const el = document.getElementById('virtual-energy-laps');
+            el.textContent = veLaps.toFixed(1);
+            el.style.color = lerpRGB([255,0,0], [0,255,0], (veLaps - 1) / 4);
+        } else {
+            document.getElementById('virtual-energy-laps').textContent = 'N/A';
+        }
+
+        // VE Time Est
+        if (valueIsValid(veLeft) && valueIsValid(vePerLap) && vePerLap > 0 && valueIsValid(avgLap)) {
+            const timeSec = (veLeft / vePerLap) * avgLap;
+            const h = Math.floor(timeSec / 3600);
+            const m = (Math.floor(timeSec / 60) % 60).toString().padStart(2, '0');
+            const s = (Math.floor(timeSec) % 60).toString().padStart(2, '0');
+            document.getElementById('virtual-energy-time').textContent = `${h}:${m}:${s}`;
+        } else {
+            document.getElementById('virtual-energy-time').textContent = '-:--:--';
+        }
+
+        // VE To End
+        if (valueIsValid(vePerLap) && valueIsValid(lapsFinish) && valueIsValid(veCapacity) && veCapacity > 0) {
+            const needed = lapsFinish * vePerLap;
+            const pct = (needed / veCapacity) * 100;
+            document.getElementById('virtual-energy-to-end').textContent = `${pct.toFixed(1)}%`;
+        } else {
+            document.getElementById('virtual-energy-to-end').textContent = 'N/A';
+        }
+
+        // VE To Add
+        if (valueIsValid(vePerLap) && valueIsValid(lapsFinish) && valueIsValid(veLeft) && valueIsValid(veCapacity) && veCapacity > 0) {
+            const needed = lapsFinish * vePerLap;
+            const deficit = Math.max(0, needed - veLeft);
+            const pct = (deficit / veCapacity) * 100;
+            const el = document.getElementById('virtual-energy-to-add');
+            el.textContent = `${pct.toFixed(1)}%`;
+            el.style.color = lerpRGB([0,255,0], [255,0,0], pct / 20);
+        } else {
+            document.getElementById('virtual-energy-to-add').textContent = 'N/A';
+        }
+
+        // Update slider display values
+        document.getElementById('val-fuel-left').textContent = fuelLeft.toFixed(1);
+        document.getElementById('val-battery-soc').textContent = batterySoC.toFixed(1);
+        document.getElementById('val-ve-left').textContent = veLeft.toFixed(2);
+    }
+
+    // Wire up controls
+    document.getElementById('btn-update').addEventListener('click', updateHUD);
+
+    let autoUpdate = false;
+    document.getElementById('btn-auto').addEventListener('click', function() {
+        autoUpdate = !autoUpdate;
+        this.textContent = `Toggle Auto-Update (${autoUpdate ? 'ON' : 'OFF'})`;
+        this.style.background = autoUpdate ? '#e94560' : '#53a8b6';
+    });
+
+    // Auto-update on any input change
+    document.querySelectorAll('#controls input, #controls select').forEach(el => {
+        el.addEventListener('input', () => { if (autoUpdate) updateHUD(); });
+    });
+
+    // Initial render
+    updateHUD();
+</script>
+
+</body>
+</html>
